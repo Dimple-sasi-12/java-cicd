@@ -31,11 +31,6 @@ pipeline {
                 }
             }
         }
-        stage('package') {
-            steps {
-                sh 'mvn install'
-            }
-        }
         stage('docker build') {
             steps {
                 script {
