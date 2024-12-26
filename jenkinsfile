@@ -1,0 +1,63 @@
+def COLOR_MAP = [
+    'SUCCESS': 'good',
+    'FAILURE': 'danger'
+    ]
+pipeline {
+    agent any
+    tools {
+        maven 'maven'
+    }
+     environment {
+        SCANNER_HOME = tool 'sonarqube'
+    }
+    stages {
+        stage('git checkout') {
+            steps {
+             git 'https://github.com/Dimple-sasi-12/basic-javaapplication.git'
+            }
+        }
+         stage('compile') {
+            steps {
+              sh 'mvn compile'
+            }
+        }
+         stage('code analysis') {
+            steps {
+              withSonarQubeEnv('sonarqube') {
+               sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=CI-CD-Project \
+               -Dsonar.java.binaries=. \
+               -Dsonar.projectKey=CI-CD-Project'''
+              }
+            }
+        }
+        stage('package') {
+            steps {
+              sh 'mvn install'
+            }
+        }
+         stage('docker build') {
+            steps {
+             script {
+                    sh 'docker build -t java-img .'
+                  }
+              }
+            }
+         stage('docker container') {
+            steps {
+             script {
+                sh 'docker run -itd -p 8082:8081 java-img'
+                  }
+              }
+            }  
+        }	
+ 
+    post {
+        always {
+            echo 'slack Notification.'
+            slackSend channel: '#dev',
+            color: COLOR_MAP [currentBuild.currentResult],
+            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \n More info at: ${env.BUILD_URl}"
+            
+        }
+    }
+}
