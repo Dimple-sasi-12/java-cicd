@@ -30,7 +30,7 @@ pipeline {
         }
         stage('docker build') {
             steps {
-               sh 'docker build -t java-img .
+               sh 'docker build -t java-img .'
                 }
             }
         stage('docker container') {
