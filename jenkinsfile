@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('git checkout') {
             steps {
-                git'https://github.com/Dimple-sasi-12/basic-javaapplication.git'
+                git branch: 'main', url: 'https://github.com/Dimple-sasi-12/basic-javaapplication.git'
             }
         }
         stage('compile') {
@@ -30,12 +30,12 @@ pipeline {
         }
         stage('docker build') {
             steps {
-               sh 'docker build -t java-img .'
-                }
+                sh 'docker build -t java-img .'
             }
+        }
         stage('docker container') {
             steps {
-               sh 'docker run -itd -p 8082:8081 java-img'
+                sh 'docker run -itd -p 8082:8081 java-img'
             }
         }
     }
