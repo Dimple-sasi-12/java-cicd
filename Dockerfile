@@ -1,10 +1,6 @@
-FROM maven AS build
+FROM amazonlinux 
 WORKDIR /app
 COPY . /app
-RUN mvn clean install
-
-FROM openjdk:17-alpine
-WORKDIR /test
-COPY --from=build /app/target/*.war /test
-CMD ["java", "-jar", "app-0.0.1-SNAPSHOT.war"]
+RUN yum install maven -y && yum install java-17 -y
+ENTRYPOINT ["java.sh"]
 EXPOSE 8081
